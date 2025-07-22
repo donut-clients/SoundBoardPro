@@ -6,12 +6,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Soundboard from "@/pages/soundboard";
 import Upload from "@/pages/upload";
+import Database from "@/pages/database";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Soundboard} />
       <Route path="/upload" component={Upload} />
+      <Route path="/database" component={Database} />
       <Route component={NotFound} />
     </Switch>
   );

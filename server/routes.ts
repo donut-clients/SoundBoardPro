@@ -109,7 +109,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete a sound
   app.delete("/api/sounds/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -134,11 +133,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all sounds from database (for community browsing)
+  app.get("/api/sounds/database", async (req, res) => {
+    try {
+      const sounds = await storage.getAllSounds();
+      res.json(sounds);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch sounds" });
+    }
+  });
+
+  // Add sound from database to user's collection
+  app.post("/api/sounds/add/:id", async (req, res) => {
+    try {
+      const sound = await storage.getSound(parseInt(req.params.id));
+      if (!sound) {
+        return res.status(404).json({ message: "Sound not found" });
+      }
+
+      // Create a copy for the user (you might want to implement user sessions later)
+      const newSound = await storage.createSound({
+        ...sound,
+        id: undefined, // Let it generate a new ID
+      });
+
+      res.status(201).json(newSound);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to add sound", error: error.message || error });
+    }
+  });
+
   // Serve audio files
   app.get("/api/audio/:filename", (req, res) => {
     const filename = req.params.filename;
     const filePath = path.join(uploadDir, filename);
-    
+
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "Audio file not found" });
     }

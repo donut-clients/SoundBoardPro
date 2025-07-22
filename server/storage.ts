@@ -8,7 +8,7 @@ export interface IStorage {
   updateSound(id: number, updates: Partial<InsertSound>): Promise<Sound | undefined>;
   deleteSound(id: number): Promise<boolean>;
   searchSounds(query: string): Promise<Sound[]>;
-  
+
   // Settings management
   getSettings(): Promise<Settings>;
   updateSettings(updates: Partial<InsertSettings>): Promise<Settings>;
