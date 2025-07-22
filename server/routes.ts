@@ -79,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const soundData = {
         name: req.body.name || path.parse(req.file.originalname).name,
         filename: req.file.filename,
-        duration: parseFloat(req.body.duration) || 0,
+        duration: parseFloat(req.body.duration) || 1.0, // Default to 1 second if not provided
         volume: parseInt(req.body.volume) || 100,
         color: req.body.color || "blue",
         keybind: req.body.keybind || undefined,
@@ -89,7 +89,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sound = await storage.createSound(validatedData);
       res.status(201).json(sound);
     } catch (error) {
-      res.status(400).json({ message: "Failed to create sound", error: error });
+      console.error("Upload error:", error);
+      res.status(400).json({ message: "Failed to create sound", error: error.message || error });
     }
   });
 

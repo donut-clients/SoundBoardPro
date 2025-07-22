@@ -17,6 +17,7 @@ export default function Upload() {
   const [color, setColor] = useState("blue");
   const [keybind, setKeybind] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const [duration, setDuration] = useState<number>(0);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -38,6 +39,7 @@ export default function Upload() {
       setVolume("100");
       setColor("blue");
       setKeybind("");
+      setDuration(0);
     },
     onError: () => {
       toast({
@@ -47,6 +49,8 @@ export default function Upload() {
       });
     },
   });
+
+  const [duration, setDuration] = useState<number>(0);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -58,10 +62,18 @@ export default function Upload() {
       
       // Get audio duration
       const audio = new Audio();
-      audio.src = URL.createObjectURL(selectedFile);
+      const objectUrl = URL.createObjectURL(selectedFile);
+      audio.src = objectUrl;
+      
       audio.addEventListener('loadedmetadata', () => {
-        console.log('Duration:', audio.duration);
-        URL.revokeObjectURL(audio.src);
+        setDuration(audio.duration || 1.0);
+        URL.revokeObjectURL(objectUrl);
+      });
+      
+      audio.addEventListener('error', () => {
+        console.warn('Could not load audio metadata, using default duration');
+        setDuration(1.0);
+        URL.revokeObjectURL(objectUrl);
       });
     }
   };
@@ -113,7 +125,7 @@ export default function Upload() {
     formData.append('name', name);
     formData.append('volume', volume);
     formData.append('color', color);
-    formData.append('duration', '0'); // Will be calculated on server
+    formData.append('duration', duration.toString());
     if (keybind) {
       formData.append('keybind', keybind);
     }
