@@ -127,8 +127,22 @@ export function useAudio() {
     activeSources.current.clear();
   }, []);
 
+  const stopSound = useCallback((soundId: number) => {
+    activeSources.current.forEach(source => {
+      if ((source as any).soundId === soundId) {
+        try {
+          source.stop();
+        } catch (e) {
+          // Source might already be stopped
+        }
+        activeSources.current.delete(source);
+      }
+    });
+  }, []);
+
   return {
     playSound,
     stopAllSounds,
+    stopSound,
   };
 }

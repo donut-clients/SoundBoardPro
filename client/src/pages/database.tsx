@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Sidebar } from "@/components/sidebar";
@@ -84,7 +83,7 @@ export default function Database() {
     <div className="min-h-screen bg-gradient-soundboard">
       <div className="flex h-screen">
         <Sidebar currentPage="database" />
-        
+
         <div className="flex-1 flex flex-col">
           {/* Header */}
           <div className="p-6 bg-white/10 backdrop-blur-sm">
@@ -93,7 +92,7 @@ export default function Database() {
               <p className="text-gray-300 mt-1">Browse and add sounds from the community database</p>
             </div>
           </div>
-          
+
           {/* Search Bar */}
           <div className="p-6 bg-white/5">
             <div className="max-w-2xl">
@@ -108,7 +107,7 @@ export default function Database() {
               </div>
             </div>
           </div>
-          
+
           {/* Sounds Grid */}
           <div className="flex-1 p-6 overflow-auto">
             {isLoading ? (
@@ -139,13 +138,13 @@ export default function Database() {
                         <span>Duration: {sound.duration.toFixed(1)}s</span>
                         <span>Volume: {sound.volume}%</span>
                       </div>
-                      
+
                       {sound.keybind && (
                         <div className="text-xs text-gray-500">
                           Keybind: {sound.keybind}
                         </div>
                       )}
-                      
+
                       <div className="flex space-x-2">
                         <Button
                           variant="outline"

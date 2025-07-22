@@ -32,7 +32,7 @@ export default function Soundboard() {
 
   const displaySounds = searchQuery.trim() ? searchResults : sounds;
   
-  const { playSound, stopAllSounds } = useAudio();
+  const { playSound, stopAllSounds, stopSound } = useAudio();
   useHotkeys({ stopAllSounds });
 
   const resetKeybindsMutation = useMutation({
@@ -109,6 +109,14 @@ export default function Soundboard() {
                   {resetKeybindsMutation.isPending ? "Resetting..." : "Reset Keybinds"}
                 </Button>
                 <Button 
+                  onClick={stopAllSounds}
+                  variant="secondary"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Stop All
+                </Button>
+                <Button 
                   onClick={handleAddSound}
                   className="bg-blue-500 hover:bg-blue-600 text-white"
                 >
@@ -160,6 +168,7 @@ export default function Soundboard() {
                     key={sound.id} 
                     sound={sound} 
                     onPlay={() => playSound(sound)}
+                    onStop={() => stopSound(sound.id)}
                   />
                 ))}
               </div>

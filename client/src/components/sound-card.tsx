@@ -5,13 +5,14 @@ import { SoundSettingsModal } from "@/components/sound-settings-modal";
 import { KeybindCaptureModal } from "@/components/keybind-capture-modal";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Play, Trash2, Link, Keyboard, Settings } from "lucide-react";
+import { Play, Stop, Trash2, Link, Keyboard, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Sound } from "@shared/schema";
 
 interface SoundCardProps {
   sound: Sound;
   onPlay: () => void;
+  onStop: () => void;
 }
 
 const colorConfig = {
@@ -33,7 +34,7 @@ const colorConfig = {
   }
 };
 
-export function SoundCard({ sound, onPlay }: SoundCardProps) {
+export function SoundCard({ sound, onPlay, onStop }: SoundCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isKeybindOpen, setIsKeybindOpen] = useState(false);
@@ -130,6 +131,13 @@ export function SoundCard({ sound, onPlay }: SoundCardProps) {
               className="p-1 h-7 w-7 text-gray-400 hover:text-gray-600"
             >
               <Settings className="w-3 h-3" />
+            </Button>
+            <Button
+              size="sm"
+              onClick={onStop}
+              className="w-8 h-8 rounded-full text-white p-0 bg-red-600 hover:bg-red-700"
+            >
+              <Stop className="w-3 h-3 fill-current" />
             </Button>
             <Button
               size="sm"
