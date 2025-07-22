@@ -136,7 +136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all sounds from database (for community browsing)
   app.get("/api/sounds/database", async (req, res) => {
     try {
-      const sounds = await storage.getAllSounds();
+      const sounds = await storage.getSounds(); // Use existing getSounds method
       res.json(sounds);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch sounds" });

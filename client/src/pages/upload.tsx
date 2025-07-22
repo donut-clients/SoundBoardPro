@@ -18,13 +18,24 @@ export default function Upload() {
   const [keybind, setKeybind] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [duration, setDuration] = useState<number>(0);
-  
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const uploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
-      const response = await apiRequest("POST", "/api/sounds", formData);
+      console.log("Uploading with FormData:", Array.from(formData.entries()));
+
+      const response = await fetch("/api/sounds", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Upload failed");
+      }
+
       return response.json();
     },
     onSuccess: () => {
@@ -57,17 +68,17 @@ export default function Upload() {
       if (!name) {
         setName(selectedFile.name.replace(/\.[^/.]+$/, ""));
       }
-      
+
       // Get audio duration
       const audio = new Audio();
       const objectUrl = URL.createObjectURL(selectedFile);
       audio.src = objectUrl;
-      
+
       audio.addEventListener('loadedmetadata', () => {
         setDuration(audio.duration || 1.0);
         URL.revokeObjectURL(objectUrl);
       });
-      
+
       audio.addEventListener('error', () => {
         console.warn('Could not load audio metadata, using default duration');
         setDuration(1.0);
@@ -78,27 +89,27 @@ export default function Upload() {
 
   const handleKeybindCapture = () => {
     setIsListening(true);
-    
+
     const handleKeydown = (e: KeyboardEvent) => {
       e.preventDefault();
-      
+
       const keys = [];
       if (e.ctrlKey) keys.push('Ctrl');
       if (e.altKey) keys.push('Alt');
       if (e.shiftKey) keys.push('Shift');
       if (e.metaKey) keys.push('Meta');
-      
+
       if (e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift' && e.key !== 'Meta') {
         keys.push(e.key === ' ' ? 'Space' : e.key);
       }
-      
+
       setKeybind(keys.join('+'));
       setIsListening(false);
       document.removeEventListener('keydown', handleKeydown);
     };
-    
+
     document.addEventListener('keydown', handleKeydown);
-    
+
     // Auto-stop listening after 5 seconds
     setTimeout(() => {
       setIsListening(false);
@@ -108,11 +119,20 @@ export default function Upload() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!file) {
       toast({
         title: "Error",
-        description: "Please select an audio file.",
+        description: "Please select an audio file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!name.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a sound name",
         variant: "destructive",
       });
       return;
@@ -135,7 +155,7 @@ export default function Upload() {
     <div className="min-h-screen bg-gradient-soundboard">
       <div className="flex h-screen">
         <Sidebar currentPage="upload" />
-        
+
         <div className="flex-1 flex flex-col">
           {/* Header */}
           <div className="p-6 bg-white/10 backdrop-blur-sm">
@@ -144,7 +164,7 @@ export default function Upload() {
               <p className="text-gray-300 mt-1">Add new sounds to your sound board</p>
             </div>
           </div>
-          
+
           {/* Upload Form */}
           <div className="flex-1 p-6">
             <div className="max-w-2xl mx-auto">

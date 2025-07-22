@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "wouter";
 import { Grid3X3, Upload, Settings, Database } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -42,17 +41,16 @@ export function Sidebar({ currentPage }: SidebarProps) {
       <div className="p-6">
         <h1 className="text-2xl font-bold text-white">Soundboard</h1>
       </div>
-      
+
       <nav className="flex-1 px-4">
         <ul className="space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id || location === item.href;
-            
+
             return (
               <li key={item.id}>
-                <Link href={item.href}>
-                  <a className={cn(
+                <Link href={item.href} className={cn(
                     "flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors",
                     isActive 
                       ? "bg-white/20 text-white" 
@@ -60,7 +58,6 @@ export function Sidebar({ currentPage }: SidebarProps) {
                   )}>
                     <Icon className="w-5 h-5" />
                     <span>{item.label}</span>
-                  </a>
                 </Link>
               </li>
             );
