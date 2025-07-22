@@ -55,6 +55,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all sounds from database (for community browsing)
+  app.get("/api/sounds/database", async (req, res) => {
+    try {
+      const sounds = await storage.getSounds();
+      res.json(sounds);
+    } catch (error) {
+      console.error("Database fetch error:", error);
+      res.status(500).json({ message: "Failed to fetch sounds" });
+    }
+  });
+
   // Get a specific sound
   app.get("/api/sounds/:id", async (req, res) => {
     try {
@@ -130,17 +141,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete sound" });
-    }
-  });
-
-  // Get all sounds from database (for community browsing)
-  app.get("/api/sounds/database", async (req, res) => {
-    try {
-      const sounds = await storage.getSounds();
-      res.json(sounds);
-    } catch (error) {
-      console.error("Database fetch error:", error);
-      res.status(500).json({ message: "Failed to fetch sounds" });
     }
   });
 
