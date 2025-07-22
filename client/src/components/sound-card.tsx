@@ -5,7 +5,7 @@ import { SoundSettingsModal } from "@/components/sound-settings-modal";
 import { KeybindCaptureModal } from "@/components/keybind-capture-modal";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Play, Stop, Trash2, Link, Keyboard, Settings } from "lucide-react";
+import { Play, Square, Trash2, Link, Keyboard, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Sound } from "@shared/schema";
 
@@ -137,7 +137,7 @@ export function SoundCard({ sound, onPlay, onStop }: SoundCardProps) {
               onClick={onStop}
               className="w-8 h-8 rounded-full text-white p-0 bg-red-600 hover:bg-red-700"
             >
-              <Stop className="w-3 h-3 fill-current" />
+              <Square className="w-3 h-3 fill-current" />
             </Button>
             <Button
               size="sm"
