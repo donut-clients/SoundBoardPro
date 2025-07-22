@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(271, 91%, 65%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Soundboard specific colors */
+  --purple-custom: hsl(271, 91%, 65%);
+  --indigo-custom: hsl(263, 70%, 25%);
+  --sidebar-background: hsl(0, 0%, 100%);
+  --gradient-start: hsl(271, 91%, 65%);
+  --gradient-end: hsl(263, 70%, 25%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(271, 91%, 65%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .bg-gradient-soundboard {
+    background: linear-gradient(to bottom, var(--gradient-start), var(--gradient-end));
+  }
+  
+  .text-sound-red {
+    color: hsl(0, 84%, 60%);
+  }
+  
+  .text-sound-green {
+    color: hsl(142, 76%, 36%);
+  }
+  
+  .text-sound-purple {
+    color: hsl(271, 91%, 65%);
+  }
+  
+  .bg-sound-red {
+    background-color: hsl(0, 84%, 60%);
+  }
+  
+  .bg-sound-green {
+    background-color: hsl(142, 76%, 36%);
+  }
+  
+  .bg-sound-purple {
+    background-color: hsl(271, 91%, 65%);
+  }
+  
+  .bg-sound-blue {
+    background-color: hsl(221, 83%, 53%);
+  }
+  
+  .hover\:bg-sound-red-dark:hover {
+    background-color: hsl(0, 84%, 50%);
+  }
+  
+  .hover\:bg-sound-green-dark:hover {
+    background-color: hsl(142, 76%, 26%);
+  }
+  
+  .hover\:bg-sound-purple-dark:hover {
+    background-color: hsl(271, 91%, 55%);
+  }
+  
+  .hover\:bg-sound-blue-dark:hover {
+    background-color: hsl(221, 83%, 43%);
+  }
+}
+
+/* Custom slider styles */
+.slider-primary::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: hsl(221, 83%, 53%);
+  cursor: pointer;
+}
+
+.slider-secondary::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: hsl(142, 76%, 36%);
+  cursor: pointer;
+}
+
+.slider-mic::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: hsl(271, 91%, 65%);
+  cursor: pointer;
+}
+
+.slider-primary::-moz-range-thumb,
+.slider-secondary::-moz-range-thumb,
+.slider-mic::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.slider-primary::-moz-range-thumb { 
+  background: hsl(221, 83%, 53%); 
+}
+
+.slider-secondary::-moz-range-thumb { 
+  background: hsl(142, 76%, 36%); 
+}
+
+.slider-mic::-moz-range-thumb { 
+  background: hsl(271, 91%, 65%); 
+}
