@@ -136,9 +136,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all sounds from database (for community browsing)
   app.get("/api/sounds/database", async (req, res) => {
     try {
-      const sounds = await storage.getSounds(); // Use existing getSounds method
+      const sounds = await storage.getSounds();
       res.json(sounds);
     } catch (error) {
+      console.error("Database fetch error:", error);
       res.status(500).json({ message: "Failed to fetch sounds" });
     }
   });
@@ -164,6 +165,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Serve audio files
+  app.get("/api/sounds/play/:filename", (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(uploadDir, filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "Audio file not found" });
+    }
+
+    res.sendFile(filePath);
+  });
+
+  // Keep backward compatibility
   app.get("/api/audio/:filename", (req, res) => {
     const filename = req.params.filename;
     const filePath = path.join(uploadDir, filename);

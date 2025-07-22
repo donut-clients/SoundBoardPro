@@ -37,33 +37,7 @@ export class MemStorage implements IStorage {
       micInjectorGain: -6,
     };
 
-    // Add some default sounds for demonstration
-    this.createSound({
-      name: "Air Horn",
-      filename: "air-horn.mp3",
-      duration: 2.0,
-      volume: 90,
-      color: "red",
-      keybind: undefined,
-    });
-
-    this.createSound({
-      name: "Applause",
-      filename: "applause.mp3",
-      duration: 4.0,
-      volume: 75,
-      color: "green",
-      keybind: "Ctrl+A",
-    });
-
-    this.createSound({
-      name: "Drum Roll",
-      filename: "drum-roll.mp3",
-      duration: 3.0,
-      volume: 85,
-      color: "purple",
-      keybind: "Space",
-    });
+    // No pre-installed sounds - start with empty storage
   }
 
   async getSounds(): Promise<Sound[]> {
