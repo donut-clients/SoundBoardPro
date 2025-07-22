@@ -1,167 +1,145 @@
 import { useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { Keyboard } from "lucide-react";
-import type { Sound, InsertSound } from "@shared/schema";
 
 interface KeybindCaptureModalProps {
-  sound: Sound | null;
   isOpen: boolean;
   onClose: () => void;
+  onCapture: (keybind: string) => void;
+  currentKeybind?: string;
 }
 
-export function KeybindCaptureModal({ sound, isOpen, onClose }: KeybindCaptureModalProps) {
-  const [keybind, setKeybind] = useState("");
-  const [isListening, setIsListening] = useState(false);
-  
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+export function KeybindCaptureModal({ 
+  isOpen, 
+  onClose, 
+  onCapture, 
+  currentKeybind 
+}: KeybindCaptureModalProps) {
+  const [capturedKey, setCapturedKey] = useState<string>("");
+  const [isCapturing, setIsCapturing] = useState(false);
 
   useEffect(() => {
-    if (sound) {
-      setKeybind(sound.keybind || "");
+    if (!isOpen) {
+      setCapturedKey("");
+      setIsCapturing(false);
+      return;
     }
-  }, [sound]);
 
-  const updateMutation = useMutation({
-    mutationFn: async (updates: Partial<InsertSound>) => {
-      if (!sound) return;
-      const response = await apiRequest("PATCH", `/api/sounds/${sound.id}`, updates);
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Keybind updated successfully!",
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/sounds'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/sounds/search'] });
-      onClose();
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update keybind.",
-        variant: "destructive",
-      });
-    },
-  });
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isCapturing) return;
 
-  const handleKeybindCapture = () => {
-    setIsListening(true);
-    
-    const handleKeydown = (e: KeyboardEvent) => {
       e.preventDefault();
-      
-      const keys: string[] = [];
-      if (e.ctrlKey) keys.push('Ctrl');
-      if (e.altKey) keys.push('Alt');
-      if (e.shiftKey) keys.push('Shift');
-      if (e.metaKey) keys.push('Meta');
-      
-      if (e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift' && e.key !== 'Meta') {
-        keys.push(e.key === ' ' ? 'Space' : e.key);
+      e.stopPropagation();
+
+      const keys = [];
+      if (e.ctrlKey) keys.push("Ctrl");
+      if (e.altKey) keys.push("Alt");
+      if (e.shiftKey) keys.push("Shift");
+      if (e.metaKey) keys.push("Meta");
+
+      // Handle special keys
+      let keyName = e.key;
+      if (keyName === " ") keyName = "Space";
+      if (keyName === "ArrowUp") keyName = "↑";
+      if (keyName === "ArrowDown") keyName = "↓";
+      if (keyName === "ArrowLeft") keyName = "←";
+      if (keyName === "ArrowRight") keyName = "→";
+
+      if (!["Control", "Alt", "Shift", "Meta"].includes(e.key)) {
+        keys.push(keyName);
       }
-      
-      setKeybind(keys.join('+'));
-      setIsListening(false);
-      document.removeEventListener('keydown', handleKeydown);
+
+      if (keys.length > 0) {
+        const keybind = keys.join("+");
+        setCapturedKey(keybind);
+        setIsCapturing(false);
+      }
     };
-    
-    document.addEventListener('keydown', handleKeydown);
-    
-    // Auto-stop listening after 5 seconds
-    setTimeout(() => {
-      setIsListening(false);
-      document.removeEventListener('keydown', handleKeydown);
-    }, 5000);
+
+    const handleContextMenu = (e: MouseEvent) => {
+      if (!isCapturing) return;
+      e.preventDefault();
+      setCapturedKey("");
+      setIsCapturing(false);
+      onCapture("");
+      onClose();
+    };
+
+    if (isCapturing) {
+      document.addEventListener("keydown", handleKeyDown, true);
+      document.addEventListener("contextmenu", handleContextMenu, true);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown, true);
+      document.removeEventListener("contextmenu", handleContextMenu, true);
+    };
+  }, [isCapturing, isOpen, onCapture, onClose]);
+
+  const handleStartCapture = () => {
+    setCapturedKey("");
+    setIsCapturing(true);
   };
 
   const handleSave = () => {
-    const updates: Partial<InsertSound> = {
-      keybind: keybind || undefined,
-    };
-    updateMutation.mutate(updates);
+    onCapture(capturedKey);
+    onClose();
   };
 
   const handleClear = () => {
-    setKeybind("");
+    onCapture("");
+    onClose();
   };
-
-  if (!sound) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm" aria-describedby="keybind-capture-description">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
-            <Keyboard className="w-5 h-5" />
-            <span>Set Keybind</span>
-          </DialogTitle>
+          <DialogTitle>Capture Keybind</DialogTitle>
         </DialogHeader>
-        
-        <p id="keybind-capture-description" className="text-sm text-gray-600 mb-4">
-          Set a keyboard shortcut for "{sound.name}".
-        </p>
-        
+
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="current-keybind">Current Keybind</Label>
-            <div className="flex space-x-2">
-              <Input
-                id="current-keybind"
-                value={keybind}
-                onChange={(e) => setKeybind(e.target.value)}
-                placeholder="No keybind"
-                readOnly={isListening}
-              />
+          <div className="text-center">
+            <p className="text-sm text-gray-600 mb-4">
+              {isCapturing ? 
+                "Press any key combination or right-click to clear..." : 
+                "Click 'Start Capture' and then press your desired key combination"
+              }
+            </p>
+
+            <div className="border rounded-lg p-4 min-h-[60px] flex items-center justify-center bg-gray-50">
+              <span className="font-mono text-lg">
+                {capturedKey || currentKeybind || "No keybind set"}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-between space-x-2">
+            <Button
+              onClick={handleStartCapture}
+              disabled={isCapturing}
+              variant="outline"
+            >
+              {isCapturing ? "Capturing..." : "Start Capture"}
+            </Button>
+
+            <div className="space-x-2">
+              <Button onClick={handleClear} variant="destructive">
+                Clear
+              </Button>
               <Button 
-                onClick={handleKeybindCapture}
-                variant="outline"
-                disabled={isListening}
-                size="sm"
+                onClick={handleSave} 
+                disabled={!capturedKey}
               >
-                {isListening ? "Listening..." : "Capture"}
+                Save
               </Button>
             </div>
-            {isListening && (
-              <p className="text-sm text-gray-600">
-                Press any key combination to set the keybind...
-              </p>
-            )}
           </div>
-        </div>
-        
-        {/* Footer */}
-        <div className="flex justify-between pt-4 border-t">
-          <Button variant="outline" onClick={handleClear}>
-            Clear
-          </Button>
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave} disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? "Saving..." : "Save"}
-            </Button>
-          </div>
-        </div>
 
-        {isListening && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg">
-              <p className="text-center">Press any key combination to set the keybind...</p>
-              <p className="text-sm text-gray-600 text-center mt-2">
-                Listening for: {sound.name}
-              </p>
-            </div>
+          <div className="text-xs text-gray-500 text-right">
+            Right-click during capture to set to none
           </div>
-        )}
+        </div>
       </DialogContent>
     </Dialog>
   );
